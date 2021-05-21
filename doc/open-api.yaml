@@ -1,0 +1,165 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: gtorresoft@gmail.com
+  title: ms_prices
+  description: Microservice for prices
+  version: 1.0.0
+servers:
+  - url: '{protocol}://{host}:{port}/{basePath}'
+    description: The Local API server
+    variables:
+      protocol:
+        enum:
+          - http
+        default: http
+        description: This value is assigned by the transfer protocol that has to be used
+      host:
+        enum:
+          - localhost
+        default: localhost
+      port:
+        enum:
+          - '8080'
+        default: '8080'
+      basePath:
+        default: v1
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+paths:
+  '/brands/{brandId}/products/{productId}/price':
+    get:
+      operationId: getPrice
+      tags:
+        - Price
+      summary: get price
+      description: |
+        Search the price
+      responses:
+        '200':
+          description: In case of success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/price'
+        '400':
+          description: |-
+            In case a wrong or missing input parameter
+            * **code 1** malformed parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: price not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '500':
+          description: Internal server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+        - schema:
+            type: string
+            format: "yyyy-MM-ddThh:mm:ss"
+          in: query
+          name: date
+          description: application date
+        - schema:
+            type: integer
+          name: brandId
+          in: path
+          required: true
+          description: identifier unique of brand
+        - schema:
+            type: integer
+          name: productId
+          in: path
+          required: true
+          description: identifier unique of product
+    parameters:
+      - schema:
+          type: string
+        name: brandId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+
+components:
+  schemas:
+    price:
+      type: object
+      writeOnly: true
+      required:
+        - price
+        - brand_id
+        - product_id
+        - rate_id
+        - date
+      properties:
+        price:
+          type: number
+          description: price
+          example: 56.5
+          readOnly: true
+        brand_id:
+          type: integer
+          description: brand id
+          example: 1
+          readOnly: true
+        product_id:
+          type: integer
+          description: product id
+          example: 1
+          readOnly: true
+        rate_id:
+          type: integer
+          description: rate id
+          example: 1
+          readOnly: true
+        date:
+          type: string
+          format: "yyyy-MM-ddThh:mm:ss"
+          description: rate id
+          example: '2021-02-02'
+          readOnly: true
+    error:
+      required:
+        - message
+        - request_id
+      type: object
+      properties:
+        message:
+          type: string
+          description: 'Describes the cause of the error. Descriptions should be compose of fixed texts for each type of error produce, therefore that must be generated from a data structure such as a listed'
+          example: Error message
+        request_id:
+          type: string
+          description: Describes a unique request code. This allows traceability in case you need to inspect logs
+          example: Request 123
+        details:
+          type: array
+          description: Contains an object with additional error detail that each product owner of the application on which they are develops the REST service and that must be defined by it. Can contain arrays in greater detail
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+                description: Error
+                example: Not null
+              field:
+                type: string
+                description: Indicates the field involved in the error
+                example: object.field
+        code:
+          type: string
+          description: 'Response provided by applications in case of error. This value will be used as the Application Error Code,being its use optional and free to use by those responsible of applications to manage their own return codes to errors, although if used, it is mandatory to document appropriately the meaning of each of the possible values  returned in said attribute, and can be documented in the file itself OpenAPI or can be properly documented (uploading documentation additional to the API with the possible error codes or a link to said  documentation to an external link) to make it easily accessible  in case of need to consult'

@@ -1,0 +1,72 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id "org.openapi.generator" version "5.1.0"
+	id 'java'
+}
+
+group = 'com.test'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.6.2'
+	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	implementation group: 'org.openapitools', name: 'jackson-databind-nullable', version: '0.2.1'
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+
+
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ["src/main/java", "$buildDir/generated/sources/annotationProcessor/java/main".toString()]
+		}
+	}
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$rootDir/doc/open-api.yaml".toString()
+	outputDir = "$buildDir/generated/sources/annotationProcessor/java/main".toString()
+	apiPackage = "com.test.demo.infrastructure.controller.api"
+	invokerPackage = "com.test.demo.infrastructure.controller.api"
+	modelPackage = "com.test.demo.infrastructure.controller.api.model"
+	modelNameSuffix = "Dto"
+	skipValidateSpec = true
+	configOptions = [
+			dateLibrary: "java8",
+			artifactId: "openapi-spring",
+			interfaceOnly: "true",
+			skipDefaultInterface : "true",
+			dateLibrary: "java8",
+			bigDecimalAsString: "true",
+
+	]
+}
