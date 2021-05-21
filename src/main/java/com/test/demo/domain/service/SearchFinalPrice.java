@@ -2,11 +2,10 @@ package com.test.demo.domain.service;
 
 import com.test.demo.domain.Price;
 import com.test.demo.domain.annotation.DomainService;
-import com.test.demo.domain.repository.PricesAdapterRepository;
+import com.test.demo.domain.adapter.repository.PricesAdapterRepository;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.Optional;
 
 @DomainService
@@ -19,7 +18,7 @@ public class SearchFinalPrice {
         Price.validProductId(brandId);
         Price.validDate(date);
         var dateToCompare = date != null ? getLocalDateTime(date) : getNow();
-        return pricesAdapterRepository.getFinalPrice(brandId, productId, dateToCompare).stream().min(Comparator.comparing(Price::getPriority));
+        return pricesAdapterRepository.getFinalPrice(brandId, productId, dateToCompare);
     }
 
     protected LocalDateTime getNow() {
